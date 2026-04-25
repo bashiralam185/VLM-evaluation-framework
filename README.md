@@ -7,8 +7,6 @@
 
 > A **modular, scenario-driven benchmarking toolkit** for evaluating Vision-Language Models (VLMs) across structured task categories. Plug in any HuggingFace VLM, define test suites in YAML, and get a full interactive HTML comparison report in minutes.
 
-Built from experience evaluating large multimodal models at **AiLiveSim**, Turku, Finland — where robust VLM benchmarking was needed for autonomous systems deployment decisions.
-
 ---
 
 ## Why This Exists
@@ -419,14 +417,13 @@ If you use this framework in research, please cite:
 
 Related work:
 - **CALF** (arXiv:2504.04458) — Conditionally Adaptive Loss Function for class-imbalanced segmentation
-- **AiLiveSim** evaluation work — benchmarking VLMs for autonomous systems deployment
 
 ---
 
 ## Author
 
 **Bashir Alam** — Machine Learning Engineer / Researcher
-Åbo Akademi University, Finland · AiLiveSim, Turku (Nov 2024 – May 2025)
+Åbo Akademi University, Finland 
 
 📧 [bashir.alam@abo.fi](mailto:bashir.alam@abo.fi) · 🔗 [LinkedIn](https://linkedin.com/in/bashir-alam/) · 🐙 [GitHub](https://github.com/bashiralam185) · 📄 [ORCID](https://orcid.org/0009-0007-8672-5529)
 
