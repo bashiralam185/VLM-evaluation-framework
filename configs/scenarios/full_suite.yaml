@@ -1,0 +1,169 @@
+# ============================================================
+# VLM Evaluation Suite — Full Benchmark Configuration
+# ============================================================
+# Usage:
+#   vlm-eval run configs/scenarios/full_suite.yaml
+#   vlm-eval run configs/scenarios/full_suite.yaml --model "LLaVA-1.5-7B"
+#   vlm-eval run configs/scenarios/full_suite.yaml --scenario "Anomaly Detection"
+
+suite_name: "VLM Benchmark — AiLiveSim Evaluation Suite"
+description: >
+  Comprehensive evaluation of Vision-Language Models across 5 structured
+  scenario categories: anomaly detection, scene understanding, image captioning,
+  VQA, and safety-critical scenarios. Aligned with real-world autonomous systems
+  evaluation at AiLiveSim.
+version: "0.1.0"
+
+# Output settings
+output_dir: "./eval_results/full_suite"
+batch_size: 4
+num_workers: 2
+seed: 42
+save_predictions: true
+export_html_report: true
+log_level: "INFO"
+
+# Triton (optional — for high-throughput GPU inference)
+use_triton: false
+triton_url: "localhost:8001"
+
+# ─────────────────────────────────────────────────────────
+# Models to evaluate
+# ─────────────────────────────────────────────────────────
+models:
+  # Lightweight open-source VLM (good starting point)
+  - name: "LLaVA-1.5-7B"
+    hf_model_id: "llava-hf/llava-1.5-7b-hf"
+    model_type: "hf_vlm"
+    device: "auto"
+    dtype: "float16"
+    max_new_tokens: 256
+    temperature: 0.0
+
+  # Smaller, faster alternative
+  - name: "SmolVLM-256M"
+    hf_model_id: "HuggingFaceTB/SmolVLM-256M-Instruct"
+    model_type: "hf_vlm"
+    device: "auto"
+    dtype: "float16"
+    max_new_tokens: 128
+    temperature: 0.0
+
+  # Mock model — for testing without GPU
+  - name: "MockVLM-Baseline"
+    hf_model_id: "mock-baseline"
+    model_type: "mock"
+
+# ─────────────────────────────────────────────────────────
+# Evaluation scenarios
+# ─────────────────────────────────────────────────────────
+scenarios:
+
+  # ── 1. Anomaly Detection ─────────────────────────────
+  - name: "Anomaly Detection"
+    description: >
+      Evaluate whether the model can identify unusual or unexpected objects
+      in road and traffic scenes. Critical for autonomous driving safety.
+    task_type: "anomaly_detection"
+    prompt_template: >
+      Carefully examine this image. Describe any unusual, unexpected, or
+      anomalous elements you observe. If the scene appears normal, say so.
+    reference_field: "captions"
+    tags: ["anomaly", "safety", "autonomous"]
+    dataset:
+      name: "synthetic_anomaly"
+      source: "synthetic"
+      max_samples: 30
+    metrics:
+      bleu: true
+      rouge: true
+      bert_score: false
+      clip_score: true
+      semantic_similarity: true
+      exact_match: false
+      accuracy: false
+
+  # ── 2. Scene Understanding ───────────────────────────
+  - name: "Scene Understanding"
+    description: >
+      Evaluate holistic scene comprehension: environment type,
+      object arrangement, spatial relationships, and context.
+    task_type: "scene_understanding"
+    prompt_template: >
+      Describe this scene comprehensively. What type of environment is shown?
+      What are the key elements and how are they arranged?
+    reference_field: "captions"
+    tags: ["scene", "captioning", "spatial"]
+    dataset:
+      name: "synthetic_scene"
+      source: "synthetic"
+      max_samples: 30
+    metrics:
+      bleu: true
+      rouge: true
+      bert_score: false
+      clip_score: true
+      semantic_similarity: true
+
+  # ── 3. Image Captioning ──────────────────────────────
+  - name: "Image Captioning"
+    description: >
+      Standard image captioning benchmark using synthetic images.
+      Measures general visual description quality.
+    task_type: "image_captioning"
+    prompt_template: "Describe this image in one to two sentences."
+    reference_field: "captions"
+    tags: ["captioning", "general"]
+    dataset:
+      name: "synthetic_captions"
+      source: "synthetic"
+      max_samples: 30
+    metrics:
+      bleu: true
+      rouge: true
+      clip_score: true
+      semantic_similarity: true
+
+  # ── 4. Visual Question Answering ─────────────────────
+  - name: "Visual QA"
+    description: >
+      Evaluate direct question-answering about visual content.
+      Tests factual accuracy and grounding.
+    task_type: "visual_question_answering"
+    prompt_template: "Answer the following about this image: What is the main colored object, and what color is it?"
+    reference_field: "captions"
+    tags: ["vqa", "factual"]
+    dataset:
+      name: "synthetic_vqa"
+      source: "synthetic"
+      max_samples: 20
+    metrics:
+      bleu: true
+      rouge: true
+      semantic_similarity: true
+      exact_match: false
+      accuracy: true
+
+  # ── 5. Safety-Critical Scenarios ─────────────────────
+  - name: "Safety Critical"
+    description: >
+      Evaluate model performance on safety-critical road scenes
+      including pedestrian detection, vehicle recognition, and debris.
+      Directly relevant to autonomous systems deployment.
+    task_type: "safety_critical"
+    prompt_template: >
+      You are an AI assistant for an autonomous vehicle system.
+      Analyze this scene and describe any safety-critical elements
+      that require immediate attention.
+    reference_field: "captions"
+    tags: ["safety", "autonomous", "critical"]
+    dataset:
+      name: "synthetic_safety"
+      source: "synthetic"
+      max_samples: 20
+    metrics:
+      bleu: true
+      rouge: true
+      clip_score: true
+      semantic_similarity: true
+      accuracy: true

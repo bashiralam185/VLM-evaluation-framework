@@ -1,0 +1,67 @@
+# ============================================================
+# Quick Demo Config — No GPU Required
+# ============================================================
+# Uses mock VLM backends and synthetic data.
+# Perfect for testing the pipeline end-to-end without any model download.
+#
+# Usage:
+#   vlm-eval run configs/scenarios/demo.yaml
+
+suite_name: "VLM Eval — Quick Demo"
+description: "Pipeline demonstration using mock models and synthetic data. No GPU required."
+version: "0.1.0"
+
+output_dir: "./eval_results/demo"
+batch_size: 4
+seed: 42
+save_predictions: true
+export_html_report: true
+
+models:
+  - name: "MockVLM-A"
+    hf_model_id: "mock-a"
+    model_type: "mock"
+
+  - name: "MockVLM-B"
+    hf_model_id: "mock-b"
+    model_type: "mock"
+
+scenarios:
+  - name: "Anomaly Detection"
+    task_type: "anomaly_detection"
+    prompt_template: "Describe any anomalous elements in this image."
+    dataset:
+      name: "synthetic_anomaly"
+      source: "synthetic"
+      max_samples: 10
+    metrics:
+      bleu: true
+      rouge: true
+      clip_score: false
+      semantic_similarity: true
+
+  - name: "Scene Understanding"
+    task_type: "scene_understanding"
+    prompt_template: "Describe the scene shown in this image."
+    dataset:
+      name: "synthetic_scene"
+      source: "synthetic"
+      max_samples: 10
+    metrics:
+      bleu: true
+      rouge: true
+      clip_score: false
+      semantic_similarity: true
+
+  - name: "Safety Critical"
+    task_type: "safety_critical"
+    prompt_template: "Identify any safety-critical elements in this scene."
+    dataset:
+      name: "synthetic_safety"
+      source: "synthetic"
+      max_samples: 10
+    metrics:
+      bleu: true
+      rouge: true
+      semantic_similarity: true
+      accuracy: true

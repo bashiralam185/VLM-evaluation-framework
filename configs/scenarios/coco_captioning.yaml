@@ -1,0 +1,47 @@
+# ============================================================
+# COCO Dataset Config
+# ============================================================
+# Uses MS-COCO for standard image captioning evaluation.
+#
+# Setup:
+#   1. Download COCO: https://cocodataset.org/#download
+#      - val2017 images (~1GB)
+#      - annotations/captions_val2017.json
+#   2. Update paths below
+#   3. Run: vlm-eval run configs/scenarios/coco_captioning.yaml
+
+suite_name: "COCO Image Captioning Benchmark"
+description: "Standard COCO captioning evaluation using val2017 split."
+version: "0.1.0"
+
+output_dir: "./eval_results/coco"
+batch_size: 8
+seed: 42
+save_predictions: true
+export_html_report: true
+
+models:
+  - name: "LLaVA-1.5-7B"
+    hf_model_id: "llava-hf/llava-1.5-7b-hf"
+    model_type: "hf_vlm"
+    device: "auto"
+    dtype: "float16"
+    max_new_tokens: 128
+
+scenarios:
+  - name: "COCO Captioning"
+    task_type: "image_captioning"
+    prompt_template: "Describe this image in one or two sentences."
+    dataset:
+      name: "coco_val2017"
+      source: "coco"
+      split: "val"
+      # UPDATE THESE PATHS:
+      image_dir: "/path/to/coco/images/val2017"
+      annotation_file: "/path/to/coco/annotations/captions_val2017.json"
+      max_samples: 500
+    metrics:
+      bleu: true
+      rouge: true
+      clip_score: true
+      semantic_similarity: true
