@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  # ── VLM Eval REST API ────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: vlm-eval-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - TRANSFORMERS_CACHE=/tmp/hf_cache
+      - HF_HOME=/tmp/hf_home
+    volumes:
+      - hf_cache:/tmp/hf_cache
+      - hf_home:/tmp/hf_home
+      - eval_results:/app/eval_results
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  # ── Triton Inference Server (optional GPU serving) ────────────────
+  # Uncomment to enable high-throughput GPU inference
+  # triton:
+  #   image: nvcr.io/nvidia/tritonserver:24.01-py3
+  #   container_name: vlm-eval-triton
+  #   ports:
+  #     - "8001:8001"
+  #     - "8002:8002"
+  #   volumes:
+  #     - ./triton_models:/models
+  #   command: tritonserver --model-repository=/models
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+
+volumes:
+  hf_cache:
+  hf_home:
+  eval_results:
